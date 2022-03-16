@@ -148,7 +148,8 @@
       "radix": 0,
       "vars-on-top": 0,
       "wrap-iife": 0,
-      "yoda": 0
+      "yoda": 0,
+      "padded-blocks": ["error", "never"]
     }
   },
   "browserslist": [

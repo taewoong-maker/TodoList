@@ -5,29 +5,30 @@
                 오늘 할 일
             </span>
         </div>
-        <div id="TodoItems">
-            <div class="TodoItem">
-                123
+        <div id="TodoItems" v-for="(item, index) in TodaysTodoList" :key="index">
+            <div :class="item.Finished ? finished : unFinished">
+                <span>{{item.TodoDetail}}</span>
+                <button :data-index="item.index" @click.prevent="fnClickFinishBtn(item.Number)">
+                    완료 </button>
             </div>
-            <div class="TodoItem">
-                123
-            </div>
-            <div class="TodoItem">
-                123
-            </div>
-            <div class="TodoItem">
-                123
-            </div>
-            <div class="TodoItem">
-                123
-            </div>
-
         </div>
     </div>
 </template>
 
 <script>
 export default {
+    props: ['TodaysTodoList'],
+    data () {
+        return {
+            finished: 'finished TodoItem',
+            unFinished: 'unFinished TodoItem'
+        }
+    },
+    methods: {
+        fnClickFinishBtn(index) {
+            alert(index);
+        }
+    }
 }
 </script>
 

@@ -10,10 +10,8 @@
             <table id="CalendarTable">
                 <tbody>
                     <tr v-for="weeks in getMonthDates" :key="weeks">
-                        <!-- <CalendarDaysTd :class="date ? dateTd : noData" v-for="date in weeks" :key="date"
-                            :date="date" @click="fnClickDateTd" /> -->
                         <td :class="date ? dateTd : noData" v-for="date in weeks" :key="date"
-                            :data-date="date" @click="fnClickDateTd($event)">
+                            :data-date="date" :ref="'date' + date" @click="fnClickDateTd($event)">
                             {{date}}
                         </td>
                     </tr>
@@ -21,10 +19,10 @@
             </table>
         </div>
         <div id="TodaysTodosContent" v-if="openTodoList">
-            <TodaysTodos />
+            <TodaysTodos :name="todaysTodoList" :Todays-todoList="todaysTodoList" Title="Title" />
             <div id="AddTodoArea">
                 <input type="text" id="addTodoInput" ref="addTodoInput">
-                <button id="addTodoBtn" @click.prevent="addTodoItem">추가</button>
+                <button id="addTodoBtn" @click.prevent="fnAddTodoItem">추가</button>
             </div>
         </div>
     </div>
@@ -38,6 +36,19 @@ import SelectBox from '../components/SelectBox.vue'
 import axios from 'axios'
                                      
 const WEEKDAY = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const TodoList = [
+    { Number: '1', Date: '2022-03-15', TodoDetail: '할일1', Finished: false, Index: '1', CreatedDate: '2022-03-15'  },
+    { Number: '2', Date: '2022-03-15', TodoDetail: '할일2', Finished: false, Index: '2', CreatedDate: '2022-03-15'  },
+    { Number: '3', Date: '2022-03-15', TodoDetail: '할일3', Finished: false, Index: '3', CreatedDate: '2022-03-15'  },
+    { Number: '4', Date: '2022-03-15', TodoDetail: '할일4', Finished: false, Index: '4', CreatedDate: '2022-03-15'  },
+    { Number: '5', Date: '2022-03-15', TodoDetail: '할일5', Finished: false, Index: '5', CreatedDate: '2022-03-15'  },
+    { Number: '6', Date: '2022-03-16', TodoDetail: '할일6', Finished: false, Index: '1', CreatedDate: '2022-03-15'  },
+    { Number: '7', Date: '2022-03-16', TodoDetail: '할일7', Finished: false, Index: '2', CreatedDate: '2022-03-15'  },
+    { Number: '8', Date: '2022-03-16', TodoDetail: '할일8', Finished: false, Index: '3', CreatedDate: '2022-03-15'  },
+    { Number: '9', Date: '2022-03-16', TodoDetail: '할일9', Finished: false, Index: '4', CreatedDate: '2022-03-15'  },
+    { Number: '10', Date: '2022-03-16', TodoDetail: '할일10', Finished: false, Index: '5', CreatedDate: '2022-03-15'  },
+]
+
 
 function daysInMonth (month, year) {
     return new Date(year, month, 0).getDate();
@@ -73,7 +84,7 @@ export default {
             const thisMonth = this.selectedMonth;
             const dates = daysInMonth(thisMonth, thisYear)
             const dateList = [];
-
+            
             let idx = 1;
             let i = 0;
             let j = 0;
@@ -105,13 +116,22 @@ export default {
     },
     methods: {
         fnClickDateTd(e) {
-            if(this.selectedDate === e.currentTarget.dataset.date) {
+            const targetDate = e.currentTarget.dataset.date;
+            const prevDate = this.selectedDate;
+            if(prevDate === targetDate) {
                 this.openTodoList = !this.openTodoList;
+                this.selectedDate = -1;
+                this.$refs['date' + targetDate][0].classList.remove('checked');
             } else {
                 // 선택한 날짜가 기존 선택된 날짜와 다를 경우, 날짜를 처음 선택한 경우 todoList를 열어준다.
-                this.selectedDate = e.currentTarget.dataset.date;
+                this.selectedDate = targetDate;
                 this.openTodoList = true;
+                this.$refs['date' + targetDate][0].classList.add('checked');
+                if(prevDate > 0) {
+                    this.$refs['date' + prevDate][0].classList.remove('checked');
+                }
             }
+            this.fnGetDotoItems();
         },
         fnChangeSelected(e, type) {
             if(type === 'year') {
@@ -120,16 +140,39 @@ export default {
                 this.selectedMonth = this.$refs.MonthSelect.$el.value
             }
             this.startDay = getStartDayIdx(this.selectedYear, this.selectedMonth);
+            this.openTodoList = false;
         },
-        addTodoItem() {
+        fnGetDotoItems() {
+            // axios.get('https://jsonplaceholder.typicode.com/users/')
+            //     .then(function(response) {
+            //         console.log(response);
+            //     })
+            //     .catch(function(error) {
+            //         console.log(error);
+            //     });
+            this.todaysTodoList = [];
+            TodoList.map((arr) => {
+                const todayDate = this.selectedYear + '-' + this.fnAddZero(this.selectedMonth) + '-' + this.fnAddZero(this.selectedDate)
+                if(arr.Date === todayDate.toString()) {
+                    this.todaysTodoList.push(arr);
+                }
+            });
+        },
+        fnAddTodoItem() {
             const todoItem = this.$refs.addTodoInput.value;
-            axios.get('https://jsonplaceholder.typicode.com/users/')
-                .then(function(response) {
-                console.log(response);
-                })
-                .catch(function(error) {
-                console.log(error);
-                });
+        },
+        fnAddZero(item) {
+            let _item;
+            if(typeof (item) !== 'string') {
+                _item = item.toString();
+            } else {
+                _item = item;
+            }
+            if(_item.length === 1) {
+                return '0' + _item;
+            } else {
+                return _item;
+            }
         }
     },
     created() {
@@ -188,5 +231,8 @@ export default {
         color: white;
         font-weight: bold;
         cursor: pointer;
+    }
+    .checked{
+        background: red;
     }
 </style>
