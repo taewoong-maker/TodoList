@@ -4,13 +4,14 @@
             <span id="TodoTitleSpan">
                 오늘 할 일
             </span>
+
         </div>
-        <div id="TodoItems" v-for="(item, index) in TodaysTodoList" :key="index">
-            <div :class="item.Finished ? finished : unFinished">
+        <div id="TodoItems" >
+            <!-- <div :class="item.Finished ? finished : unFinished">
                 <span>{{item.TodoDetail}}</span>
-                <button :data-index="item.index" @click.prevent="fnClickFinishBtn(item.Number)">
-                    완료 </button>
-            </div>
+            </div> -->
+            <el-checkbox v-for="(item, index) in TodaysTodoList"
+                v-model="item.Finished" @click.prevent="fnChangeFinished(index)" :key="index" :label="item.TodoDetail" size="large" border />
         </div>
     </div>
 </template>
@@ -20,15 +21,14 @@ export default {
     props: ['TodaysTodoList'],
     data () {
         return {
-            finished: 'finished TodoItem',
-            unFinished: 'unFinished TodoItem'
+            todaysTodoList: this.TodaysTodoList
         }
     },
     methods: {
-        fnClickFinishBtn(index) {
-            alert(index);
+        fnChangeFinished: function(index) {
+            this.todaysTodoList[index].Finished = !this.todaysTodoList[index].Finished;
         }
-    }
+    },
 }
 </script>
 
@@ -40,10 +40,12 @@ export default {
         display: flex;
         flex-flow: nowrap column;
     }
-    .TodoItem{
-        background: rgb(226, 226, 226);
+   .TodoItem{
         border-radius: 10px;
-        margin: 5px;
         font-size: 20px;
+        margin: 5px;
+    }
+    .el-checkbox:last-of-type {
+        margin-right: none;
     }
 </style>
