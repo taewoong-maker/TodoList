@@ -17,16 +17,19 @@
 </template>
 
 <script>
+
 export default {
-    props: ['TodaysTodoList'],
+    props: ['TodaysTodoList', 'name'],
     data () {
         return {
-            todaysTodoList: this.TodaysTodoList
+            list: this.TodaysTodoList,
         }
     },
     methods: {
         fnChangeFinished: function(index) {
-            this.todaysTodoList[index].Finished = !this.todaysTodoList[index].Finished;
+            debugger;
+            const flag = this.TodaysTodoList[index].Finished;
+            this.$emit('fnCompleteTodo', {index, flag})
         }
     },
 }

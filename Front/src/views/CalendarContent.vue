@@ -18,13 +18,12 @@
                         <td class="noHover">Fri</td>
                         <td class="noHover">Sat</td>
                     </tr>
-                    <tr v-for="weeks in getMonthDates" :key="weeks">
+                    <tr v-for="weekItem in getMonthDates" :key="weekItem">
                         <td
-                            v-for="date in weeks" :key="date"
-                            :data-date="date" :ref="'date' + date" @click="fnClickDateTd($event)"
-                            :class="{ inDate: date, 'todayDate':
-                            selectedYear + '-' + fnAddZero(selectedMonth) + date=== fnGetTodayDate() }">
-                            {{date}}
+                            v-for="dateItem in weekItem" :key="dateItem"
+                            :data-date="dateItem" :ref="'date' + dateItem" @click="fnClickDateTd($event)"
+                            :class="{ inDate: dateItem, 'todayDate': fnIsToday(dateItem) }">
+                            {{dateItem}}
                         </td>
                     </tr>
                 </tbody>
@@ -32,7 +31,7 @@
         </div>
         
         <div id="TodaysTodosContent" v-if="openTodoList">
-            <TodaysTodos :name="todaysTodoList" :Todays-todoList="todaysTodoList" />
+            <TodaysTodos :Todays-todoList="todaysTodoList" name="hahah" @fnCompleteTodo="fnCompleteTodo" />
             <div id="AddTodoArea">
                 <input type="text" id="addTodoInput" ref="addTodoInput" @keydown="fnAddTodoItemCheckKey($event)">
                 <button id="addTodoBtn" @click.prevent="fnAddTodoItem">추가</button>
@@ -46,9 +45,7 @@
 import TodaysTodos from './TodaysTodos.vue'
 import SelectBox from '../components/SelectBox.vue'
 //import axios from 'axios'
-import { ref } from 'vue'
 
-const calendar = ref()
 const WEEKDAY = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const TodoList = [
     { Number: '1', Date: '2022-03-15', TodoDetail: '할일1', Finished: false, Index: '1', CreatedDate: '2022-03-15'  },
@@ -150,27 +147,6 @@ export default {
             this.selectedCalendarDate = this.fnGetDateFormat(this.selectedYear, this.selectedMonth, this.selectedDate);
             this.fnGetTodoItems();
         },
-        fnClickDateTd2(data) {
-            debugger;
-            console.log(data)
-            const targetDate = '2022-01-17';
-            const prevDate = this.selectedDate;
-            if(prevDate === targetDate) {
-                this.openTodoList = !this.openTodoList;
-                this.selectedDate = -1;
-                this.$refs['date' + targetDate][0].classList.remove('checked');
-            } else {
-                // 선택한 날짜가 기존 선택된 날짜와 다를 경우, 날짜를 처음 선택한 경우 todoList를 열어준다.
-                this.selectedDate = targetDate;
-                this.openTodoList = true;
-                this.$refs['date' + targetDate][0].classList.add('checked');
-                if(prevDate > 0) {
-                    this.$refs['date' + prevDate][0].classList.remove('checked');
-                }
-            }
-            this.selectedCalendarDate = this.fnGetDateFormat(this.selectedYear, this.selectedMonth, this.selectedDate);
-            this.fnGetTodoItems();
-        },
         fnChangeSelected(e, type) {
             if(type === 'year') {
                 this.selectedYear = this.$refs.YearSelect.$el.value
@@ -235,6 +211,21 @@ export default {
             const today = new Date();
             return this.fnGetDateFormat(today.getFullYear(), today.getMonth() + 1, today.getDate());
         },
+        fnIsToday(param) {
+            const date = new Date();
+            const flag1 = this.selectedYear === date.getFullYear();
+            const flag2 = this.selectedMonth === date.getMonth() + 1;
+            
+            let _param;
+            typeof (param) === 'string' ? _param = parseInt(param) : _param = param;
+            const flag3 = _param === date.getDate();
+            if(flag1 && flag2 && flag3) {
+                return true;
+            }
+        },
+        fnCompleteTodo(param) {
+            this.todaysTodoList[param.index].Finished = !param.flag;
+        }
     },
     created() {
         const date = new Date();
@@ -303,7 +294,7 @@ export default {
     .checked{
         background: #f2f8fe;
     }
-    .today{
+    .todayDate{
         color:red;
     }
 </style>
