@@ -6,9 +6,7 @@
 </template>
 <script>
   export default {
-    // 이건 dev에서 커밋한거야1111
-    // 이건 dev에서 커밋한거야1222
-    // 이건 dev에서 커밋한거야1333
+    // 이건 dev2에서 커밋한거야1111
   }
 </script>
 
